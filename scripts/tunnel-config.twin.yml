@@ -1,0 +1,18 @@
+# config.yml for the TWIN PC (same tunnel credentials json as the primary). Both PCs are connectors
+# of one tunnel; Cloudflare spreads requests across them and stops using a connector that goes down.
+#
+# AppServer runs only on the primary PC, so the twin must forward everything except /api to it.
+# It needs an address of the primary that does NOT go back through poztrans.tikgamer.win (that would
+# loop). Fill PRIMARY_APPSERVER_URL with e.g. a Tailscale/VPN address: http://100.x.y.z:8001
+# (the primary's AppServer must then listen on that interface, not only on localhost).
+# NOTE: not yet tested on a second machine.
+tunnel: f44dd1c2-e68c-4820-89b8-5b647241bb73
+credentials-file: C:\Users\admin\.cloudflared\f44dd1c2-e68c-4820-89b8-5b647241bb73.json
+ingress:
+  - hostname: poztrans.tikgamer.win
+    path: ^/api(/.*)?$
+    service: http://localhost:8000
+  - hostname: poztrans.tikgamer.win
+    path: ^/(health|apps|admin)(/.*)?$
+    service: PRIMARY_APPSERVER_URL
+  - service: http_status:404
